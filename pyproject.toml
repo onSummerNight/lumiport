@@ -7,6 +7,7 @@ name = "lumiport"
 version = "0.1.0"
 description = "OpenEdge ABL inventory and Python migration assistant"
 requires-python = ">=3.10"
+license = {text = "MIT"}
 dependencies = ["typer"]
 
 [project.optional-dependencies]

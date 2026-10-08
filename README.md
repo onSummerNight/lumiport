@@ -55,4 +55,4 @@ The sample ABL in `samples/` is synthetic, written for this repository. Nothing 
 
 ## License
 
-Not decided yet. There is no LICENSE file.
+MIT. See [LICENSE](LICENSE).

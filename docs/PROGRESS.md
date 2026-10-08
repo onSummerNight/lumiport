@@ -17,16 +17,17 @@
 - Step 9: tested on Python 3.10 and 3.14 (69 passed each); `PROCEDURE x PRIVATE:` recognised (2026-10-08)
 - Step 10: include args, `FUNCTION ... IN`, case-insensitive tables (per file and in report), 76 tests pass (2026-10-08)
 - Step 11: linear-time adjacency in `build_graph`, 5,000-file scale test, 77 tests pass (2026-10-08)
+- Step 12: MIT `LICENSE`, pre-public audit clean (secrets, IPs, hosts, emails, .env), tag v0.1.0 (2026-10-08)
+- **v1 done:** `lumiport scan <dir> [--out] [--report]` gives inventory, graph, cycles, migration order, complexity score and Markdown report; 77 tests on Python 3.10 and 3.14
 
 ## Now
-- Step 11 done, awaiting manager review (`docs/BRIEF.md` Result)
+- Awaiting user: push, tag push, make public
 
 ## Next
-- v1 review by manager; license decision
+- Nothing queued
 
 ## Later
 - Claude mode: draft Python for one procedure from its inventory facts
-- Decide deadline, public/portfolio repo, license
 
 ## Blockers
 - None

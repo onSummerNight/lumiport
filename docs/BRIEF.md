@@ -1,29 +1,39 @@
-# Brief: step 11, linear-time graph build + scale check
+# Brief: step 12, close v1 (MIT license, pre-public audit, v0.1.0 tag)
 
-**Goal:** `build_graph` scales linearly. The adjacency list is built in one pass over the edges instead of one pass per file. A synthetic scale test guards against regressions.
+**Goal:** the repo is ready to go public as v0.1.0. It needs an MIT license, a clean audit of the working tree and the full git history, and a local annotated tag. Push and visibility are left for the user.
 
-**Why now:** this is the last in-scope item under Later. Real ABL codebases have thousands of files, and right now the adjacency build costs files × edges.
+**Why now:** the user chose to close v1, use MIT and make the repo public (`docs/DECISIONS.md`, 2026-10-08).
 
 ## Steps
-1. `graph.py`: build `adj` with one pass over `edges` (for example a `defaultdict(set)`, sorted per node afterwards) so the iteration order and output stay identical. Change nothing else unless a profile shows another quadratic spot. If it does, name it in Result.
-2. `tests/test_graph.py`: generate 5,000 synthetic file dicts in memory. Each gets 3 runs to deterministic other files (for example `i+1`, `i*7 % n` and `i*13 % n`) and 1 include into 50 shared `.i` files. Assert that `build_graph` finishes in under 5 s and that `order` covers every file exactly once.
-3. Measure only, assert nothing: time `scan_dir` on a temporary folder of 2,000 generated `.p` files of about 30 lines each. Report the seconds in Result together with the before and after times of `build_graph` on the 5,000-file set.
-4. Remove the graph item from Later in `docs/PROGRESS.md`.
+1. `LICENSE`: the standard MIT text, `Copyright (c) 2026 Luminous` (from `git config user.name`). In Result, ask the user to confirm the holder name. `pyproject.toml`: `license = {text = "MIT"}`. README: replace "Not decided yet" with MIT plus a link to `LICENSE`.
+2. Audit the working tree and every commit (`git log -p --all`) for:
+   - secrets and tokens (`gho_`, `ghp_`, `sk-`, `AKIA`, `BEGIN .* KEY`, `password`)
+   - IP addresses, hostnames other than github.com, and email addresses other than the commit author's
+   - any `.env` file ever committed
+
+   List each match and its verdict in Result. Rewriting history is out of scope, so stop if anything real turns up.
+3. Check that `pyproject.toml` and `__version__` both say `0.1.0`. Rewrite `docs/PROGRESS.md`:
+   - Done: a short v1 summary
+   - Now: "awaiting user: push, tag push, make public"
+   - Later: Claude mode only
+4. Commit, then `git tag -a v0.1.0 -m "LumiPort v0.1.0: ABL inventory, graph, migration order, report"`. Don't push the commit or the tag, and don't change the repo's visibility.
+5. Run the full acceptance checks one last time: pytest on 3.14 and on a fresh 3.10 venv, the CLI-vs-`expected.json` check, and the `--report` diff.
 
 ## Acceptance check
-`.venv/bin/pytest -q` passes, including the scale test. The CLI-vs-`expected.json` and `--report` diff checks still exit 0.
+All four checks from step 5 pass. `git tag -n v0.1.0` shows the tag on the new commit. The audit lists no real findings.
 
 ## Constraints
-- Standard library only. The output must stay byte-for-byte identical on the samples. Don't edit `samples/`, `expected.json` or `expected-report.md`.
+- No code changes. Don't edit `CONTEXT.md`.
 
 ## Out of scope
-- Speeding up the tokenizer or `scan_dir`. Report their timing; if it is slow, I'll brief it separately.
-- Parallelism, caching, the CLI.
+- `git push`, `gh repo edit --visibility public`, PyPI, CI, badges. The manager asks the user about these after review.
 
 ## Result
 
-Done. `.venv/bin/pytest -q`: `77 passed in 0.06s`; CLI JSON == `expected.json`, `--report` diff exit 0.
-- `build_graph`, 5,000 files (4,950 `.p` + 50 `.i`, 19,800 edges): before 1.9 s, after 0.02 s.
-- `scan_dir`, 2,000 generated `.p` files (about 21 lines each, plus 1 `.i`): 0.2 s. No slow spot found.
+Done. Not pushed, visibility unchanged (repo still private).
+- pytest: 3.10.20 `77 passed in 0.09s`; 3.14.7 `77 passed in 0.06s`. CLI JSON == `expected.json`; `--report` diff exit 0.
+- Audit (20 commits, `git log -p --all`, 3,748 lines + working tree): no `gho_`/`ghp_`/`sk-`/`AKIA`/`BEGIN .* KEY`/`password` matches; no IPs; only URL is github.com/multica-ai/andrej-karpathy-skills (CLAUDE.md credit); no `.env`/key/db file ever committed.
+- Emails: `luminous@lumidev.online` (all 20 commits, author = committer) and `noreply@anthropic.com` (Co-Authored-By). `@pytest`/`@app` matches are decorators.
+- Version: `pyproject.toml` and `__version__` both `0.1.0`.
 
-No other quadratic spot named. Nothing to decide. Timing assert in the test is 5 s as briefed.
+Decide: (1) confirm the LICENSE holder "Luminous" (from `git config user.name`). (2) `luminous@lumidev.online` becomes public in every commit once the repo flips; confirm that is fine. (3) Push of commits and tag, and the visibility flip, are yours.

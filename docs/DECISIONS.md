@@ -22,3 +22,8 @@ Append-only. Date, decision, why, alternatives rejected.
 - Decision: basename resolution uses the target's last path segment; a self-call stays in `edges` and `cycles`. Per-file `metrics`: `loc` (lines with code after stripping), `blocks` (`END` keywords), `branches` (`IF` + `WHEN`), `fan_in`/`fan_out` (distinct other files on graph edges). `score = loc + 2*(branches + blocks) + 5*(fan_in + fan_out)`.
 - Why: every input is countable by hand on the samples, so the golden test can pin it; coupling is weighted more than size because it decides migration risk.
 - Rejected: cyclomatic complexity per unit (needs real parsing); unweighted sum (lets long, flat files dominate).
+
+## 2026-10-08: close v1, MIT license, public repo
+- Decision: v1 is closed as v0.1.0. License is MIT. The GitHub repo becomes public after a pre-publication audit and a final explicit yes from the user at the moment of the flip.
+- Why: all v1 scope and in-scope Later items are done and pinned by 77 tests on Python 3.10 and 3.14; MIT is the simplest permissive license for a portfolio tool.
+- Rejected: staying private (user chose public); deciding the license later (left the README with an open question).

@@ -36,3 +36,6 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 20:50 | claude | /work step 10: extractor gaps (include args, FUNCTION IN, table case), report grouping, SCHEMA/README, 7 tests | 76 passed, CLI + report diffs exit 0
 2026-10-08 18:58 | claude (manager) | reviewed brief step 10 extractor gaps | accepted: 76 passed rerun on 3.14 and fresh 3.10 venv, expected files untouched, code read; commit bb70e85 not pushed
 2026-10-08 21:20 | claude | /work step 11: one-pass adjacency in graph.py, scale test | build_graph 1.9s -> 0.02s on 5000 files; 77 passed; CLI + report diffs exit 0
+2026-10-08 19:03 | claude (manager) | reviewed brief step 11 linear graph + scale test | accepted: 77 passed rerun, scale test 0.02s, adjacency change surgical, samples byte-identical; 2 commits not pushed; all in-scope Later items closed
+2026-10-08 19:04 | claude (manager) | user chose: close v1 as v0.1.0, MIT, make repo public (flip needs final yes) | recorded in DECISIONS
+2026-10-08 22:00 | claude | /work step 12: LICENSE (MIT), pyproject license, README, audit, PROGRESS | audit clean; 77 passed on 3.10.20 and 3.14.7; CLI + report diffs exit 0; tagged v0.1.0 locally, not pushed
