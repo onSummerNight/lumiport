@@ -14,9 +14,10 @@
 - Step 6: `metrics.file_metrics`, per-file `metrics` + score in scan output, 63 tests pass (2026-10-08)
 - Step 7: `report.render_report`, `scan --report FILE`, `samples/expected-report.md`, 66 tests pass (2026-10-08)
 - Step 8: `README.md` (install, usage, limitations, clean room), verified in a fresh clone (2026-10-08)
+- Step 9: tested on Python 3.10 and 3.14 (69 passed each); `PROCEDURE x PRIVATE:` recognised (2026-10-08)
 
 ## Now
-- Step 8 done, awaiting manager review (`docs/BRIEF.md` Result)
+- Step 9 done, awaiting manager review (`docs/BRIEF.md` Result)
 
 ## Next
 - v1 review by manager; license decision
@@ -24,7 +25,7 @@
 ## Later
 - Claude mode: draft Python for one procedure from its inventory facts
 - Decide deadline, public/portfolio repo, license
-- Extractor gaps: `PROCEDURE x PRIVATE:` not matched; `{1}` include args counted as includes; `FUNCTION ... IN handle` counted as unit; table names differing only in case are separate keys
+- Extractor gaps: `{1}` include args counted as includes; `FUNCTION ... IN handle` counted as unit; table names differing only in case are separate keys
 - graph.py builds adjacency in O(files × edges): fine for samples, slow on large repos
 
 ## Blockers

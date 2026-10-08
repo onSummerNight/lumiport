@@ -29,3 +29,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 19:10 | claude | /work step 7: report.py, cli --report, expected-report.md, test_report | 66 passed, CLI report == expected-report.md
 2026-10-08 18:49 | claude (manager) | reviewed brief step 7 Markdown report | accepted: 66 passed rerun, --report diff clean, summary loc/units/tables recomputed (77/7/4), a.p and common.i scores re-checked by hand; commit 182df8d not pushed
 2026-10-08 19:40 | claude | /work step 8: README.md, fresh-clone run of every command | all commands exit 0, 66 passed
+2026-10-08 18:52 | claude (manager) | reviewed brief step 8 README | accepted: 66 passed rerun, README claims match tests, limitations honest; v1 success check (golden scan == expected.json) met; 2 commits not pushed
+2026-10-08 20:10 | claude | /work step 9: py3.10 venv run, _PROC PRIVATE, 3 tests, README/PROGRESS gap lines | 69 passed on 3.10.20 and 3.14.7, CLI + report diffs exit 0

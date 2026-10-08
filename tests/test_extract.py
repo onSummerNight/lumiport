@@ -87,3 +87,17 @@ def test_find_current_with_lock():
 def test_field_references_are_not_access():
     code = "FOR EACH order-line WHERE order-line.order-num = order.num:\nEND.\n"
     assert extract_tables(code) == {"order-line": "read"}
+
+
+def test_private_procedure():
+    got = extract_calls("PROCEDURE p PRIVATE:\nEND PROCEDURE.\n")
+    assert got["units"] == [{"name": "p", "type": "procedure"}]
+
+
+def test_lower_case_private_procedure():
+    got = extract_calls("procedure p private:\nend procedure.\n")
+    assert got["units"] == [{"name": "p", "type": "procedure"}]
+
+
+def test_end_procedure_is_not_a_unit():
+    assert extract_calls("END PROCEDURE.\n")["units"] == []

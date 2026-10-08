@@ -3,7 +3,7 @@ import re
 _NAME = r"[A-Za-z_][\w\-]*"
 _B = r"(?<![\w-])"  # keyword start: not inside DYNAMIC-FUNCTION and the like
 
-_PROC = re.compile(_B + r"(END\s+)?PROCEDURE\s+(" + _NAME + r")\s*:", re.I)
+_PROC = re.compile(_B + r"(END\s+)?PROCEDURE\s+(" + _NAME + r")(?:\s+PRIVATE)?\s*:", re.I)
 _FUNC = re.compile(_B + r"(END\s+)?FUNCTION\s+(" + _NAME + r")", re.I)
 _METHOD = re.compile(_B + r"(END\s+)?METHOD(?![\w-])", re.I)
 _INCLUDE = re.compile(r"\{\s*([^\s{}]+)")
