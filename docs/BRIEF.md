@@ -1,30 +1,30 @@
-# Brief: step 2, synthetic sample app + golden expected.json
+# Brief: step 3, tokenizer (strip comments and strings)
 
-**Goal:** a hand-written ABL sample app in `samples/app/`, its expected inventory in `samples/expected.json`, and a golden test marked `xfail(strict=True)` until the scanner exists.
+**Goal:** `lumiport.tokenizer.strip_code(text: str) -> str` blanks out comments and string literals, so later extractors only see real code.
 
-**Why now:** this fixes the output format and the success check before any scanner code is written.
+**Why now:** every extractor (units, RUN, includes, tables) depends on it. `report.p` already contains decoys it has to defeat.
 
 ## Steps
-1. Write 8–12 synthetic files in `samples/app/` (`.p`, `.i`, `.cls`, generic retail-order theme). Make sure they cover: internal `PROCEDURE` and `FUNCTION`, a class `METHOD`, `{inc.i}` includes, `RUN x.p` calls with one cycle (a.p → b.p → a.p), one `RUN VALUE(...)`, `FOR EACH`/`FIND` (read), `CREATE`/`DELETE` (write), `DEFINE BUFFER b FOR t`, and nested `/* /* */ */` comments and strings that contain fake `RUN`/`FOR EACH` text, which must be ignored.
-2. Write `samples/expected.json` by hand: `{"files": [...]}` sorted by path. Each file entry has `path` (relative to `samples/app`, using `/`), `kind` (`p|i|cls`), `units` (`[{"name","type":"procedure|function|method"}]`), `includes`, `runs` (resolved targets), `unresolved_runs` (count), and `tables` (`{name: "read"|"write"}`, where write wins and buffers resolve to their table). Every list is sorted.
-3. Write `docs/SCHEMA.md` (about 20 lines), describing those fields and their rules.
-4. `tests/test_golden.py`: run `scan` on `samples/app` with JSON output and compare it to `expected.json`. Mark it `xfail(strict=True, reason="scanner not built")`.
+1. `src/lumiport/tokenizer.py`: one pass, character by character. Replace every character inside a comment or string with a space, but keep newlines so line numbers and offsets still match the source. Quotes and comment markers are blanked as well.
+2. Rules: `/* */` nests to any depth. Strings use `"` or `'`. Inside a string, `~` escapes the next character and a doubled quote (`""` / `''`) does not end it. `/*` inside a string is plain text, and a quote inside a comment is plain text. An unterminated comment or string blanks everything to the end of the file (no exception).
+3. `tests/test_tokenizer.py`: one small test per rule above. Add one test on `samples/app/report.p` showing that `ghost`, `phantom`, `fake.p`, `decoy` and `ghost-row` are gone while `printLine` and `FOR EACH order` remain.
+4. Check that output length and newline count equal the input's, on every sample file.
 
 ## Acceptance check
-`.venv/bin/pytest -q` → 2 passed, 1 xfailed. You review `expected.json` against the sources by hand and describe in Result how you checked it.
+`.venv/bin/pytest -q`: all tokenizer tests pass, the existing 2 still pass, and the golden test stays xfailed.
 
 ## Constraints
-- Clean room: invent every name. No real company, product or schema names.
-- Don't change the CLI yet. The test may call a function that doesn't exist yet (that is the expected failure).
+- Standard library only. No regex-based comment stripping, because nesting needs a counter.
+- Don't touch `expected.json` or `SCHEMA.md`.
 
 ## Out of scope
-- Graph, migration order and complexity score fields (a later brief adds them to the schema), the tokenizer, and any scanner code.
+- Extracting units, RUN calls, includes or tables. Keyword case-folding. Preprocessor (`&SCOPED-DEFINE`, `{&NAME}`) handling.
+- `{include.i}` braces are code, not comments: leave them.
 
 ## Result
 Done.
 ```
-pytest -q: 2 passed, 1 xfailed in 0.02s
-expected.json: 11 files, paths sorted, valid JSON
+pytest -q: 15 passed, 1 xfailed in 0.03s
+(13 tokenizer tests incl. report.p decoys and length/newline check on all 11 samples; golden still xfailed)
 ```
-How checked: grepped every RUN / include / unit / FOR EACH / FIND / CREATE / DELETE / DEFINE BUFFER line in the sources and compared each to its entry by hand. No scanner output exists to compare against yet; please spot-check `expected.json` yourself.
-Decide: (1) I chose the test entry point `lumiport.scanner.scan_dir(Path) -> dict`; the CLI JSON option comes later. (2) `RUN addLine` (internal, no `.p`) is ignored, not counted as unresolved; written into SCHEMA.md.
+Nothing to decide. Choice: `\r` is kept like `\n`; a `~` escaping a newline keeps that newline.

@@ -9,3 +9,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 08:19 | claude | /work step 1 skeleton: pyproject, src/lumiport, cli scan stub, tests/test_cli.py | 2 passed, scan docs exit 0
 2026-10-08 08:19 | claude (manager) | reviewed brief step 1 skeleton | accepted: 2 passed rerun, scope clean; Python 3.10 untested
 2026-10-08 08:27 | claude | /work step 2: samples/app (11 files), expected.json, docs/SCHEMA.md, xfail golden test | 2 passed, 1 xfailed
+2026-10-08 08:28 | claude (manager) | reviewed brief step 2 sample app + expected.json | accepted: 2 passed 1 xfailed rerun, expected.json spot-checked vs all 11 sources, matches; commit e1636fa not pushed
+2026-10-08 08:29 | claude | /work step 3: tokenizer.strip_code + tests/test_tokenizer.py | 15 passed, 1 xfailed
