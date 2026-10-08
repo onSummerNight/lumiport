@@ -15,3 +15,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 08:30 | claude | /work step 4a: extract.extract_calls + tests/test_extract.py | 32 passed, 1 xfailed
 2026-10-08 08:31 | claude (manager) | reviewed brief step 4a extract_calls | accepted: 32 passed 1 xfailed rerun, code read; gaps logged to Later (PROCEDURE x PRIVATE:, {1} args, FUNCTION IN handle)
 2026-10-08 08:40 | claude | /work step 4b: extract.extract_tables + tests | 49 passed, 1 xfailed
+2026-10-08 08:34 | claude (manager) | reviewed brief step 4b extract_tables | accepted: 49 passed 1 xfailed rerun, code read; gap: table-name case variants become separate keys (Later)
+2026-10-08 08:50 | claude | /work step 4c: scanner.scan_dir + CLI JSON, golden un-xfailed | 51 passed, 0 xfailed

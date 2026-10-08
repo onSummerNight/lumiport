@@ -1,28 +1,25 @@
-# Brief: step 4b, extract table access and buffers
+# Brief: step 4c, scan_dir + CLI JSON (golden test goes green)
 
-**Goal:** `lumiport.extract.extract_tables(code: str) -> dict`, which returns `{table: "read"|"write"}` for one stripped file, following `docs/SCHEMA.md`.
+**Goal:** `lumiport.scanner.scan_dir(Path) -> dict` produces the full inventory from `docs/SCHEMA.md`, and `lumiport scan <dir>` outputs it as JSON. The golden test passes for real.
 
-**Why now:** this is the second half of the extractors. After it, 4c can build `scan_dir` and turn the golden test green.
+**Why now:** this ties the tokenizer and both extractors together and meets the v1 success check for the inventory.
 
 ## Steps
-1. Buffers first: collect every `DEFINE BUFFER b FOR t` in the file, wherever it appears, so a use before the definition still resolves. Alias lookup is case-insensitive and maps to `t` as written in the definition.
-2. Read: `FOR EACH|FIRST|LAST name`, the `, EACH|FIRST|LAST name` join parts, and `FIND [FIRST|LAST|NEXT|PREV|CURRENT] name`. Write: `CREATE name` and `DELETE name`. Write wins over read.
-3. Not tables: dynamic objects after `CREATE` (`QUERY`, `BUFFER`, `TEMP-TABLE`, `WIDGET-POOL`, `ALIAS`, `SERVER`, `SOCKET`, `X-DOCUMENT`, `X-NODEREF`) and after `DELETE` (`OBJECT`, `PROCEDURE`, `WIDGET`, `WIDGET-POOL`, `ALIAS`). Field references such as `order.num` or `order-line.order-num` are never access.
-4. `tests/test_extract.py`: per sample file, parametrized, compare `tables` to `expected.json`. Add inline tests for lower-case keywords, `FOR EACH a, EACH b`, buffer used before its definition, `CREATE QUERY hQ`, `DELETE OBJECT h`, and `FIND CURRENT x EXCLUSIVE-LOCK`.
+1. `src/lumiport/scanner.py`: walk `<dir>` recursively for `.p`, `.i` and `.cls`, matching the extension case-insensitively, sorted by relative path with `/`. Decode each file as UTF-8, falling back to latin-1. Run `strip_code`, then `extract_calls` and `extract_tables`. Build `{"files": [...]}` with the field order `path, kind, units, includes, runs, unresolved_runs, tables`. `kind` is the lowercased extension.
+2. `cli.py`: `scan <dir>` prints the JSON (indent 2) to stdout. `--out FILE` writes it to a file instead. Keep the exit-2 check for a directory that doesn't exist. Remove the "not implemented" text.
+3. `tests/test_golden.py`: remove the `xfail` marker. Add a CLI test: `scan samples/app --out tmp.json` produces a file equal to `expected.json`.
+4. Update `tests/test_cli.py` if the old stub output assertion breaks. Add one test that an empty directory gives `{"files": []}`.
 
 ## Acceptance check
-`.venv/bin/pytest -q`: all new tests pass, the existing 32 still pass, and the golden test stays xfailed.
+`.venv/bin/pytest -q` → all passed, 0 xfailed. Also `.venv/bin/lumiport scan samples/app | python3 -c "import json,sys; assert json.load(sys.stdin)==json.load(open('samples/expected.json'))"` exits 0.
 
 ## Constraints
-- Standard library only. Change only `extract.py` and `test_extract.py`. If a sample disagrees with the schema, stop and report it in Result.
+- Standard library + Typer only. Don't change `tokenizer.py`, `extract.py`, `expected.json` or `SCHEMA.md`. If the golden test fails because an extractor is wrong, stop and report it in Result rather than patching around it.
 
 ## Out of scope
-- `scan_dir`, CLI output, `DEFINE BUFFER ... FOR TEMP-TABLE`, DB-qualified names (`db.table`), `ASSIGN`/field updates as write, and the 4a gaps listed under Later.
+- Dependency graph, cycles, migration order, complexity score, Markdown report (the next briefs), and `.w` files.
 
 ## Result
-Done. `.venv/bin/pytest -q`:
-```
-....................................x.............                       [100%]
-49 passed, 1 xfailed in 0.04s
-```
-All 11 sample files match `expected.json` tables; no schema conflicts. Nothing to decide.
+Done. `.venv/bin/pytest -q`: `51 passed in 0.04s` (0 xfailed).
+`lumiport scan samples/app | python3 -c "...assert == expected.json"` exit=0.
+Empty-dir test is the existing `test_scan_existing_dir`, now asserting `{"files": []}`. Nothing to decide.
