@@ -19,9 +19,11 @@ def render_report(inventory: dict) -> str:
         kinds[f["kind"]] = kinds.get(f["kind"], 0) + 1
     readers: dict = {}
     writers: dict = {}
+    spelling: dict = {}  # lower-case name -> first spelling in path order
     for f in files:
         for table, mode in f["tables"].items():
-            (writers if mode == "write" else readers).setdefault(table, []).append(f["path"])
+            name = spelling.setdefault(table.lower(), table)
+            (writers if mode == "write" else readers).setdefault(name, []).append(f["path"])
     tables = sorted(set(readers) | set(writers))
     unresolved = [f for f in files if f["unresolved_runs"]]
 

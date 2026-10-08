@@ -45,7 +45,6 @@ Excerpt of the report for the sample app (full file: [samples/expected-report.md
 
 - It is a tokenizer-level scanner, not a parser. It strips comments and strings, then matches keywords.
 - Dynamic calls such as `RUN VALUE(...)` are counted as unresolved, never resolved.
-- Known extractor gaps: `{1}` include arguments are counted as includes; `FUNCTION ... IN handle` is counted as a unit; table names that differ only in case are separate tables.
 - `//` line comments and keyword abbreviations are not handled.
 - `.w` files are skipped.
 - Tested on Python 3.10 and 3.14.

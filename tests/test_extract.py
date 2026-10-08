@@ -101,3 +101,30 @@ def test_lower_case_private_procedure():
 
 def test_end_procedure_is_not_a_unit():
     assert extract_calls("END PROCEDURE.\n")["units"] == []
+
+
+def test_include_argument_references_are_not_includes():
+    assert extract_calls("{1}\n{*}\n{&X}\n{a.i}\n")["includes"] == ["a.i"]
+
+
+def test_function_in_handle_is_not_a_unit():
+    code = "FUNCTION f RETURNS INT (INPUT p AS INT) IN hLib.\n"
+    assert extract_calls(code)["units"] == []
+
+
+def test_function_in_super_is_not_a_unit():
+    assert extract_calls("FUNCTION g RETURNS INT IN SUPER.\n")["units"] == []
+
+
+def test_function_with_input_parameter_is_a_unit():
+    code = "FUNCTION h RETURNS INT (INPUT-OUTPUT p AS INT, INPUT q AS INT):\nEND FUNCTION.\n"
+    assert extract_calls(code)["units"] == [{"name": "h", "type": "function"}]
+
+
+def test_table_case_merges_to_first_spelling():
+    code = "FIND customer NO-LOCK.\nFOR EACH Customer:\nEND.\n"
+    assert extract_tables(code) == {"customer": "read"}
+
+
+def test_table_case_merge_write_wins():
+    assert extract_tables("FIND Customer NO-LOCK.\nCREATE customer.\n") == {"Customer": "write"}

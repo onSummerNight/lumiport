@@ -10,6 +10,22 @@ _INCLUDE = re.compile(r"\{\s*([^\s{}]+)")
 _RUN = re.compile(_B + r"RUN\s+(?:(VALUE\s*\()|([\w\-./]+\.p)\b)", re.I)
 
 
+def _in_handle(code: str) -> bool:
+    """True if the FUNCTION header (up to the first `:` or `.` outside parentheses) has IN."""
+    depth = 0
+    header = []
+    for ch in code:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(depth - 1, 0)
+        elif not depth:
+            if ch in ":.":
+                break
+            header.append(ch)
+    return bool(re.search(r"(?<![\w-])IN(?![\w-])", "".join(header), re.I))
+
+
 def extract_calls(code: str) -> dict:
     """Units, includes and RUN calls of one file; `code` is already stripped."""
     units = set()
@@ -20,7 +36,7 @@ def extract_calls(code: str) -> dict:
         if m.group(1):
             continue
         header = re.split(r"[:.]", code[m.end() :], maxsplit=1)[0]
-        if not re.search(r"(?<![\w-])FORWARD(?![\w-])", header, re.I):
+        if not re.search(r"(?<![\w-])FORWARD(?![\w-])", header, re.I) and not _in_handle(code[m.end() :]):
             units.add((m.group(2), "function"))
     for m in _METHOD.finditer(code):
         if m.group(1):
@@ -31,7 +47,7 @@ def extract_calls(code: str) -> dict:
             units.add((tokens[-1], "method"))
 
     includes = {
-        m.group(1) for m in _INCLUDE.finditer(code) if not m.group(1).startswith("&")
+        m.group(1) for m in _INCLUDE.finditer(code) if not m.group(1).startswith(("&", "*")) and not m.group(1)[0].isdigit()
     }
 
     runs = set()
@@ -74,11 +90,18 @@ def extract_tables(code: str) -> dict:
     def table(name: str) -> str:
         return buffers.get(name.lower(), name)
 
-    access = {}
+    events = []  # (position, name, mode)
     for m in _READ.finditer(code):
-        access.setdefault(table(m.group(1) or m.group(2)), "read")
+        events.append((m.start(), table(m.group(1) or m.group(2)), "read"))
     for m in _WRITE.finditer(code):
         verb, name = m.group(1).upper(), m.group(2)
         if name.upper() not in _NOT_TABLE[verb]:
-            access[table(name)] = "write"
-    return dict(sorted(access.items()))
+            events.append((m.start(), table(name), "write"))
+    spelling = {}
+    access = {}
+    for _, name, mode in sorted(events):
+        key = name.lower()
+        spelling.setdefault(key, name)
+        if mode == "write" or key not in access:
+            access[key] = mode
+    return dict(sorted((spelling[k], v) for k, v in access.items()))

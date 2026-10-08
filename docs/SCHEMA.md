@@ -18,7 +18,9 @@ Rules:
 - `RUN` of a name without `.p` (an internal procedure) is not a file call: not in `runs`, not counted unresolved.
 - `FOR EACH` and `FIND` mark a table `read`; `CREATE` and `DELETE` mark it `write`. Write wins over read.
 - `DEFINE BUFFER b FOR t` makes `b` an alias: access through `b` counts for table `t`.
-- Table and unit names keep the case used in the source.
+- Unit names keep the case used in the source. Table names match case-insensitively: within a file they merge into one key spelled as at first occurrence in the source; the report groups them across files the same way, using the first spelling in path order.
+- `{...}` is an include only if its first token does not start with `&`, `*` or a digit (`{&NAME}`, `{*}` and `{1}` are references).
+- A `FUNCTION` whose header (up to the first `:` or `.` outside parentheses) has the keyword `IN` outside parentheses (`IN hProc`, `IN SUPER`) is a prototype, not a unit. `INPUT` parameters don't trigger this.
 
 ## `metrics`
 

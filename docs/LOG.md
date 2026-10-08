@@ -32,3 +32,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 18:52 | claude (manager) | reviewed brief step 8 README | accepted: 66 passed rerun, README claims match tests, limitations honest; v1 success check (golden scan == expected.json) met; 2 commits not pushed
 2026-10-08 20:10 | claude | /work step 9: py3.10 venv run, _PROC PRIVATE, 3 tests, README/PROGRESS gap lines | 69 passed on 3.10.20 and 3.14.7, CLI + report diffs exit 0
 2026-10-08 20:20 | claude | /save-progress after step 9 | 69 passed (3.10, 3.14); tree clean, pushed; next: manager review of step 9, license decision
+2026-10-08 18:55 | claude (manager) | reviewed brief step 9 py3.10 + PROCEDURE PRIVATE | accepted: 69 passed rerun on 3.14 and on a fresh uv 3.10 venv; README/Later updated; v1 complete
+2026-10-08 20:50 | claude | /work step 10: extractor gaps (include args, FUNCTION IN, table case), report grouping, SCHEMA/README, 7 tests | 76 passed, CLI + report diffs exit 0

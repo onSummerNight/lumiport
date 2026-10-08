@@ -1,30 +1,33 @@
-# Brief: step 9, Python 3.10 check + `PROCEDURE x PRIVATE:`
+# Brief: step 10, remaining extractor gaps
 
-**Goal:** prove the test suite passes on Python 3.10, the declared minimum, and recognise `PROCEDURE name PRIVATE:` as a procedure unit.
+**Goal:** close the three gaps listed under Later. Include-argument references stop counting as includes, `FUNCTION ... IN handle` prototypes stop counting as units, and table names merge case-insensitively.
 
-**Why now:** v1 is built and the success check passes. These are the two cheapest honest gaps to close: one is an untested promise in `pyproject.toml`/README, the other is the most common real-world unit form we miss.
+**Why now:** v1 is complete. These gaps make real-world scans over-count includes and units and split tables, so fixing them is what makes the output trustworthy. All three stay inside the locked scope.
 
 ## Steps
-1. Python 3.10: create a venv with `uv venv --python 3.10 <scratch dir>`, install with `uv pip install --python <that venv> -e '.[dev]'`, then run its pytest. If anything fails, fix only what is needed for 3.10, using the smallest change that works.
-2. `extract.py`: `_PROC` accepts an optional `PRIVATE` (case-insensitive) between the name and `:`. Nothing else changes, and `END PROCEDURE` is still never a unit.
-3. `tests/test_extract.py`: add inline tests for `PROCEDURE p PRIVATE:`, lower-case `procedure p private:`, and `END PROCEDURE.` not matching.
-4. Remove the PRIVATE gap from the README Limitations and from Later in `docs/PROGRESS.md`. Replace the README line "Only tested on Python 3.14" with the versions actually tested.
-5. Paste both pytest outputs (3.10 and 3.14) into Result.
+1. Includes: skip a `{...}` whose first token starts with a digit or `*`, i.e. include-argument references like `{1}` or `{*}`. `{&NAME}` is already skipped.
+2. Units: skip a `FUNCTION` whose header, up to its first `:` or `.`, contains the keyword `IN` outside parentheses. That covers both `IN hProc` and `IN SUPER`. `INPUT`/`INPUT-OUTPUT` parameters must not trigger it.
+3. Tables, within one file: in `extract_tables`, merge names case-insensitively and keep the spelling of the first occurrence in the source. Write still wins.
+4. Tables, across files: in `render_report`, group the Tables section and the summary count case-insensitively, using the first spelling in path order. Update `docs/SCHEMA.md` with the rules from steps 1–4, and remove these gaps from the README Limitations and from Later in `docs/PROGRESS.md`.
+5. Tests:
+   - inline tests for `{1}` and `{*}`
+   - `FUNCTION f RETURNS INT (INPUT p AS INT) IN hLib.`
+   - `FUNCTION g RETURNS INT IN SUPER.`
+   - a normal function with an `INPUT` parameter, still counted
+   - `customer` plus `Customer` in one file giving one key
+   - a report test with two files that spell a table differently
 
 ## Acceptance check
-`.venv/bin/pytest -q` passes, the same suite passes under the 3.10 venv, and the CLI-vs-`expected.json` and `--report` diff checks still exit 0.
+`.venv/bin/pytest -q` passes. The CLI-vs-`expected.json` and `--report` diff checks still exit 0, unchanged, because the samples have none of these cases.
 
 ## Constraints
-- Don't edit `samples/`, `expected.json` or `expected-report.md`. Don't commit the 3.10 venv: keep it outside the repo.
+- Standard library only. Don't edit `samples/`, `expected.json` or `expected-report.md`. If one of them needs to change, stop and report it in Result.
 
 ## Out of scope
-- The other extractor gaps (`{1}` args, `FUNCTION ... IN handle`, table-name case), `PROCEDURE ... EXTERNAL`/`IN SUPER`, CI, LICENSE.
+- The O(files × edges) graph fix, `//` comments, keyword abbreviations, `PROCEDURE ... EXTERNAL`/`IN SUPER`, the cycle display format.
 
 ## Result
 
-Done. No 3.10 fixes were needed (venv kept outside the repo, via uv).
-- Python 3.10.20: `pytest -q` -> `69 passed in 0.09s`
-- Python 3.14.7: `pytest -q` -> `69 passed in 0.04s`
-- CLI `--out` JSON == `expected.json`; `--report` diff vs `expected-report.md` exit 0
+Done. `.venv/bin/pytest -q`: `76 passed in 0.05s`. CLI `--out` JSON == `expected.json`; `--report` diff vs `expected-report.md` exit 0. `samples/` and expected files untouched.
 
-Nothing to decide.
+Decide: table spelling inside a file is "first occurrence in source" across reads and writes (position order), not read-first. 3.10 was not rerun for this step.
