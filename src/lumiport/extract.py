@@ -48,3 +48,37 @@ def extract_calls(code: str) -> dict:
         "runs": sorted(runs),
         "unresolved_runs": unresolved,
     }
+
+
+_BUFFER = re.compile(
+    _B + r"DEFINE\s+(?:[\w\-]+\s+)*?BUFFER\s+(" + _NAME + r")\s+FOR\s+(" + _NAME + r")",
+    re.I,
+)
+_READ = re.compile(
+    r"(?:" + _B + r"FOR\s+|,\s*)(?:EACH|FIRST|LAST)\s+(" + _NAME + r")"
+    r"|" + _B + r"FIND\s+(?:(?:FIRST|LAST|NEXT|PREV|CURRENT)(?![\w-])\s+)?(" + _NAME + r")",
+    re.I,
+)
+_WRITE = re.compile(_B + r"(CREATE|DELETE)\s+(" + _NAME + r")", re.I)
+_NOT_TABLE = {
+    "CREATE": {"QUERY", "BUFFER", "TEMP-TABLE", "WIDGET-POOL", "ALIAS", "SERVER",
+               "SOCKET", "X-DOCUMENT", "X-NODEREF"},
+    "DELETE": {"OBJECT", "PROCEDURE", "WIDGET", "WIDGET-POOL", "ALIAS"},
+}
+
+
+def extract_tables(code: str) -> dict:
+    """Table access of one file as {table: "read"|"write"}; `code` is already stripped."""
+    buffers = {m.group(1).lower(): m.group(2) for m in _BUFFER.finditer(code)}
+
+    def table(name: str) -> str:
+        return buffers.get(name.lower(), name)
+
+    access = {}
+    for m in _READ.finditer(code):
+        access.setdefault(table(m.group(1) or m.group(2)), "read")
+    for m in _WRITE.finditer(code):
+        verb, name = m.group(1).upper(), m.group(2)
+        if name.upper() not in _NOT_TABLE[verb]:
+            access[table(name)] = "write"
+    return dict(sorted(access.items()))
