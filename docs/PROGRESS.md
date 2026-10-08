@@ -3,6 +3,7 @@
 ## Done
 - Scaffold created
 - Context agreed and LOCKED 2026-10-08
+- Repo on GitHub (private): onSummerNight/lumiport
 
 ## Now
 - Step 1 below
