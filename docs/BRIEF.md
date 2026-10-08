@@ -1,25 +1,27 @@
-# Brief: step 4c, scan_dir + CLI JSON (golden test goes green)
+# Brief: step 5, dependency graph, cycles, migration order
 
-**Goal:** `lumiport.scanner.scan_dir(Path) -> dict` produces the full inventory from `docs/SCHEMA.md`, and `lumiport scan <dir>` outputs it as JSON. The golden test passes for real.
+**Goal:** `scan_dir` output gains a top-level `graph` with `edges`, `missing`, `cycles` and `order`, following the 2026-10-08 entry in `docs/DECISIONS.md`. The golden test covers it.
 
-**Why now:** this ties the tokenizer and both extractors together and meets the v1 success check for the inventory.
+**Why now:** the inventory is done. Graph and order are the next v1 scope item, and the complexity score and report build on them.
 
 ## Steps
-1. `src/lumiport/scanner.py`: walk `<dir>` recursively for `.p`, `.i` and `.cls`, matching the extension case-insensitively, sorted by relative path with `/`. Decode each file as UTF-8, falling back to latin-1. Run `strip_code`, then `extract_calls` and `extract_tables`. Build `{"files": [...]}` with the field order `path, kind, units, includes, runs, unresolved_runs, tables`. `kind` is the lowercased extension.
-2. `cli.py`: `scan <dir>` prints the JSON (indent 2) to stdout. `--out FILE` writes it to a file instead. Keep the exit-2 check for a directory that doesn't exist. Remove the "not implemented" text.
-3. `tests/test_golden.py`: remove the `xfail` marker. Add a CLI test: `scan samples/app --out tmp.json` produces a file equal to `expected.json`.
-4. Update `tests/test_cli.py` if the old stub output assertion breaks. Add one test that an empty directory gives `{"files": []}`.
+1. `docs/SCHEMA.md`: add `graph` with these fields:
+   - `edges`: `[[from, to, "run"|"include"]]`, sorted.
+   - `missing`: sorted `[[from, target]]` for targets that don't resolve.
+   - `cycles`: each cycle's files sorted, cycles themselves sorted. Only components with more than one file, or a file that calls itself.
+   - `order`: `[[paths...], ...]` steps.
+2. `src/lumiport/graph.py`: `build_graph(files: list) -> dict`. Resolve each target by exact relative path (case-insensitive), else by unique basename, else put it in `missing`. Find strongly connected components iteratively (no recursion limit issues). Each step contains every component whose dependencies all sit in earlier steps.
+3. `scanner.scan_dir` returns `{"files": [...], "graph": build_graph(files)}`.
+4. Update `samples/expected.json` by hand. My hand computation, for you to confirm or contradict:
+   - Steps: 1 = common.i, consts.i, order-purge.p, price-calc.p, util.i; 2 = a.p, b.p, order-create.p, ordermgr.cls, report.p; 3 = main.p.
+   - One cycle: [a.p, b.p]. No missing targets.
+5. `tests/test_graph.py`: inline tests for a self-call, a missing target, a diamond, basename resolution, an ambiguous basename (goes to `missing`), and a 3-file cycle.
 
 ## Acceptance check
-`.venv/bin/pytest -q` → all passed, 0 xfailed. Also `.venv/bin/lumiport scan samples/app | python3 -c "import json,sys; assert json.load(sys.stdin)==json.load(open('samples/expected.json'))"` exits 0.
+`.venv/bin/pytest -q`: all pass, 0 xfailed. The CLI-vs-`expected.json` check from step 4c still exits 0.
 
 ## Constraints
-- Standard library + Typer only. Don't change `tokenizer.py`, `extract.py`, `expected.json` or `SCHEMA.md`. If the golden test fails because an extractor is wrong, stop and report it in Result rather than patching around it.
+- Standard library only. Don't change `tokenizer.py` or `extract.py`. Edit `expected.json` only to add `graph`.
 
 ## Out of scope
-- Dependency graph, cycles, migration order, complexity score, Markdown report (the next briefs), and `.w` files.
-
-## Result
-Done. `.venv/bin/pytest -q`: `51 passed in 0.04s` (0 xfailed).
-`lumiport scan samples/app | python3 -c "...assert == expected.json"` exit=0.
-Empty-dir test is the existing `test_scan_existing_dir`, now asserting `{"files": []}`. Nothing to decide.
+- Complexity score, Markdown report, any graph drawing (dot/mermaid).

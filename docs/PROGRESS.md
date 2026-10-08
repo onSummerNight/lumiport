@@ -12,7 +12,7 @@
 - Step 4c: `scanner.scan_dir`, `lumiport scan [--out]` JSON, golden test green (2026-10-08)
 
 ## Now
-- Awaiting brief for step 5 (dependency graph, cycles, migration order)
+- Step 5 (graph, cycles, migration order) briefed in `docs/BRIEF.md`: run `/work`
 
 ## Next
 - Graph + cycles + migration order, complexity score, Markdown report

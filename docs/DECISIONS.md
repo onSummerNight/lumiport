@@ -12,3 +12,8 @@ Append-only. Date, decision, why, alternatives rejected.
 - Decision: golden test calls `lumiport.scanner.scan_dir(Path) -> dict`. `RUN name` without `.p` is an internal call: not in `runs`, not counted as unresolved.
 - Why: a pure function is testable without the CLI; internal calls are not file dependencies.
 - Rejected: testing via CLI JSON output only (CLI option not built yet); counting internal RUNs as unresolved (would inflate the metric).
+
+## 2026-10-08: dependency graph and migration order shape
+- Decision: edges are RUN calls and includes (both are dependencies to port first). Targets resolve by exact relative path (case-insensitive), else by unique basename, else go to `missing`. Cycles (strongly connected components) migrate together. `order` is a list of steps (levels): a file's step comes after all of its dependencies' steps; each step is sorted.
+- Why: levels are deterministic with no tie-break rule, and they show what can be ported in parallel. Includes become shared Python modules, so they belong in the order.
+- Rejected: one flat topological list (needs an arbitrary tie-break); RUN-only edges (would hide the coupling that includes create).
