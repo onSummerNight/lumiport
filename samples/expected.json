@@ -111,5 +111,28 @@
       "unresolved_runs": 0,
       "tables": {}
     }
-  ]
+  ],
+  "graph": {
+    "edges": [
+      ["a.p", "b.p", "run"],
+      ["a.p", "common.i", "include"],
+      ["b.p", "a.p", "run"],
+      ["b.p", "common.i", "include"],
+      ["main.p", "a.p", "run"],
+      ["main.p", "common.i", "include"],
+      ["main.p", "consts.i", "include"],
+      ["order-create.p", "common.i", "include"],
+      ["order-create.p", "price-calc.p", "run"],
+      ["order-create.p", "util.i", "include"],
+      ["ordermgr.cls", "order-purge.p", "run"],
+      ["report.p", "common.i", "include"]
+    ],
+    "missing": [],
+    "cycles": [["a.p", "b.p"]],
+    "order": [
+      ["common.i", "consts.i", "order-purge.p", "price-calc.p", "util.i"],
+      ["a.p", "b.p", "order-create.p", "ordermgr.cls", "report.p"],
+      ["main.p"]
+    ]
+  }
 }

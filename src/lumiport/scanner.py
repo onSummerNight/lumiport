@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from lumiport.extract import extract_calls, extract_tables
+from lumiport.graph import build_graph
 from lumiport.tokenizer import strip_code
 
 _KINDS = {".p", ".i", ".cls"}
@@ -33,4 +34,4 @@ def scan_dir(directory: Path) -> dict:
                 "tables": extract_tables(code),
             }
         )
-    return {"files": files}
+    return {"files": files, "graph": build_graph(files)}

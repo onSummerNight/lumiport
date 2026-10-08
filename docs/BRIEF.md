@@ -25,3 +25,10 @@
 
 ## Out of scope
 - Complexity score, Markdown report, any graph drawing (dot/mermaid).
+
+## Result
+Done. Hand computation confirmed (3 steps, one cycle [a.p, b.p], no missing).
+- `.venv/bin/pytest -q`: 57 passed, 0 xfailed
+- CLI `scan samples/app --out` vs `expected.json`: exit 0, identical
+- Also edited `tests/test_cli.py` (empty-dir expectation now includes `graph`), not listed in the brief.
+Decide: a basename match uses the target's last path segment; a self-edge is kept in `edges` and `cycles`.
