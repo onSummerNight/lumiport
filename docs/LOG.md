@@ -11,3 +11,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 08:27 | claude | /work step 2: samples/app (11 files), expected.json, docs/SCHEMA.md, xfail golden test | 2 passed, 1 xfailed
 2026-10-08 08:28 | claude (manager) | reviewed brief step 2 sample app + expected.json | accepted: 2 passed 1 xfailed rerun, expected.json spot-checked vs all 11 sources, matches; commit e1636fa not pushed
 2026-10-08 08:29 | claude | /work step 3: tokenizer.strip_code + tests/test_tokenizer.py | 15 passed, 1 xfailed
+2026-10-08 08:29 | claude (manager) | reviewed brief step 3 tokenizer | accepted: 15 passed 1 xfailed rerun, code read, scope clean; 2 commits not pushed
+2026-10-08 08:30 | claude | /work step 4a: extract.extract_calls + tests/test_extract.py | 32 passed, 1 xfailed
