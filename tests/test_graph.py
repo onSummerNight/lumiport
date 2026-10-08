@@ -1,3 +1,5 @@
+import time
+
 from lumiport.graph import build_graph
 
 
@@ -48,3 +50,17 @@ def test_three_file_cycle():
     ])
     assert g["cycles"] == [["a.p", "b.p", "c.p"]]
     assert g["order"] == [["a.p", "b.p", "c.p"], ["d.p"]]
+
+
+def test_scale_5000_files():
+    n = 4950
+    files = [
+        f(f"d/f{i}.p", runs=[f"d/f{(i + 1) % n}.p", f"d/f{i * 7 % n}.p", f"d/f{i * 13 % n}.p"],
+          includes=[f"inc{i % 50}.i"])
+        for i in range(n)
+    ] + [f(f"inc{k}.i") for k in range(50)]
+    start = time.perf_counter()
+    g = build_graph(files)
+    assert time.perf_counter() - start < 5
+    ordered = [p for step in g["order"] for p in step]
+    assert sorted(ordered) == sorted(x["path"] for x in files)

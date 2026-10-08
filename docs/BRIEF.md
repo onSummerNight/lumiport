@@ -1,33 +1,29 @@
-# Brief: step 10, remaining extractor gaps
+# Brief: step 11, linear-time graph build + scale check
 
-**Goal:** close the three gaps listed under Later. Include-argument references stop counting as includes, `FUNCTION ... IN handle` prototypes stop counting as units, and table names merge case-insensitively.
+**Goal:** `build_graph` scales linearly. The adjacency list is built in one pass over the edges instead of one pass per file. A synthetic scale test guards against regressions.
 
-**Why now:** v1 is complete. These gaps make real-world scans over-count includes and units and split tables, so fixing them is what makes the output trustworthy. All three stay inside the locked scope.
+**Why now:** this is the last in-scope item under Later. Real ABL codebases have thousands of files, and right now the adjacency build costs files × edges.
 
 ## Steps
-1. Includes: skip a `{...}` whose first token starts with a digit or `*`, i.e. include-argument references like `{1}` or `{*}`. `{&NAME}` is already skipped.
-2. Units: skip a `FUNCTION` whose header, up to its first `:` or `.`, contains the keyword `IN` outside parentheses. That covers both `IN hProc` and `IN SUPER`. `INPUT`/`INPUT-OUTPUT` parameters must not trigger it.
-3. Tables, within one file: in `extract_tables`, merge names case-insensitively and keep the spelling of the first occurrence in the source. Write still wins.
-4. Tables, across files: in `render_report`, group the Tables section and the summary count case-insensitively, using the first spelling in path order. Update `docs/SCHEMA.md` with the rules from steps 1–4, and remove these gaps from the README Limitations and from Later in `docs/PROGRESS.md`.
-5. Tests:
-   - inline tests for `{1}` and `{*}`
-   - `FUNCTION f RETURNS INT (INPUT p AS INT) IN hLib.`
-   - `FUNCTION g RETURNS INT IN SUPER.`
-   - a normal function with an `INPUT` parameter, still counted
-   - `customer` plus `Customer` in one file giving one key
-   - a report test with two files that spell a table differently
+1. `graph.py`: build `adj` with one pass over `edges` (for example a `defaultdict(set)`, sorted per node afterwards) so the iteration order and output stay identical. Change nothing else unless a profile shows another quadratic spot. If it does, name it in Result.
+2. `tests/test_graph.py`: generate 5,000 synthetic file dicts in memory. Each gets 3 runs to deterministic other files (for example `i+1`, `i*7 % n` and `i*13 % n`) and 1 include into 50 shared `.i` files. Assert that `build_graph` finishes in under 5 s and that `order` covers every file exactly once.
+3. Measure only, assert nothing: time `scan_dir` on a temporary folder of 2,000 generated `.p` files of about 30 lines each. Report the seconds in Result together with the before and after times of `build_graph` on the 5,000-file set.
+4. Remove the graph item from Later in `docs/PROGRESS.md`.
 
 ## Acceptance check
-`.venv/bin/pytest -q` passes. The CLI-vs-`expected.json` and `--report` diff checks still exit 0, unchanged, because the samples have none of these cases.
+`.venv/bin/pytest -q` passes, including the scale test. The CLI-vs-`expected.json` and `--report` diff checks still exit 0.
 
 ## Constraints
-- Standard library only. Don't edit `samples/`, `expected.json` or `expected-report.md`. If one of them needs to change, stop and report it in Result.
+- Standard library only. The output must stay byte-for-byte identical on the samples. Don't edit `samples/`, `expected.json` or `expected-report.md`.
 
 ## Out of scope
-- The O(files × edges) graph fix, `//` comments, keyword abbreviations, `PROCEDURE ... EXTERNAL`/`IN SUPER`, the cycle display format.
+- Speeding up the tokenizer or `scan_dir`. Report their timing; if it is slow, I'll brief it separately.
+- Parallelism, caching, the CLI.
 
 ## Result
 
-Done. `.venv/bin/pytest -q`: `76 passed in 0.05s`. CLI `--out` JSON == `expected.json`; `--report` diff vs `expected-report.md` exit 0. `samples/` and expected files untouched.
+Done. `.venv/bin/pytest -q`: `77 passed in 0.06s`; CLI JSON == `expected.json`, `--report` diff exit 0.
+- `build_graph`, 5,000 files (4,950 `.p` + 50 `.i`, 19,800 edges): before 1.9 s, after 0.02 s.
+- `scan_dir`, 2,000 generated `.p` files (about 21 lines each, plus 1 `.i`): 0.2 s. No slow spot found.
 
-Decide: table spelling inside a file is "first occurrence in source" across reads and writes (position order), not read-first. 3.10 was not rerun for this step.
+No other quadratic spot named. Nothing to decide. Timing assert in the test is 5 s as briefed.

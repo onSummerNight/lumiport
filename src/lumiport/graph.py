@@ -65,7 +65,10 @@ def build_graph(files: list) -> dict:
                 else:
                     edges.add((f["path"], dest, kind))
 
-    adj = {p: sorted({b for a, b, _ in edges if a == p}) for p in paths}
+    out_edges = defaultdict(set)
+    for a, b, _ in edges:
+        out_edges[a].add(b)
+    adj = {p: sorted(out_edges[p]) for p in paths}
     comps = _components(paths, adj)
     cycles = sorted(c for c in comps if len(c) > 1 or c[0] in adj[c[0]])
 

@@ -16,9 +16,10 @@
 - Step 8: `README.md` (install, usage, limitations, clean room), verified in a fresh clone (2026-10-08)
 - Step 9: tested on Python 3.10 and 3.14 (69 passed each); `PROCEDURE x PRIVATE:` recognised (2026-10-08)
 - Step 10: include args, `FUNCTION ... IN`, case-insensitive tables (per file and in report), 76 tests pass (2026-10-08)
+- Step 11: linear-time adjacency in `build_graph`, 5,000-file scale test, 77 tests pass (2026-10-08)
 
 ## Now
-- Step 10 done, awaiting manager review (`docs/BRIEF.md` Result)
+- Step 11 done, awaiting manager review (`docs/BRIEF.md` Result)
 
 ## Next
 - v1 review by manager; license decision
@@ -26,7 +27,6 @@
 ## Later
 - Claude mode: draft Python for one procedure from its inventory facts
 - Decide deadline, public/portfolio repo, license
-- graph.py builds adjacency in O(files × edges): fine for samples, slow on large repos
 
 ## Blockers
 - None

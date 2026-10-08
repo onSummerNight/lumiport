@@ -34,3 +34,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 20:20 | claude | /save-progress after step 9 | 69 passed (3.10, 3.14); tree clean, pushed; next: manager review of step 9, license decision
 2026-10-08 18:55 | claude (manager) | reviewed brief step 9 py3.10 + PROCEDURE PRIVATE | accepted: 69 passed rerun on 3.14 and on a fresh uv 3.10 venv; README/Later updated; v1 complete
 2026-10-08 20:50 | claude | /work step 10: extractor gaps (include args, FUNCTION IN, table case), report grouping, SCHEMA/README, 7 tests | 76 passed, CLI + report diffs exit 0
+2026-10-08 18:58 | claude (manager) | reviewed brief step 10 extractor gaps | accepted: 76 passed rerun on 3.14 and fresh 3.10 venv, expected files untouched, code read; commit bb70e85 not pushed
+2026-10-08 21:20 | claude | /work step 11: one-pass adjacency in graph.py, scale test | build_graph 1.9s -> 0.02s on 5000 files; 77 passed; CLI + report diffs exit 0
