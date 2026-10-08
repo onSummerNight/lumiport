@@ -17,3 +17,8 @@ Append-only. Date, decision, why, alternatives rejected.
 - Decision: edges are RUN calls and includes (both are dependencies to port first). Targets resolve by exact relative path (case-insensitive), else by unique basename, else go to `missing`. Cycles (strongly connected components) migrate together. `order` is a list of steps (levels): a file's step comes after all of its dependencies' steps; each step is sorted.
 - Why: levels are deterministic with no tie-break rule, and they show what can be ported in parallel. Includes become shared Python modules, so they belong in the order.
 - Rejected: one flat topological list (needs an arbitrary tie-break); RUN-only edges (would hide the coupling that includes create).
+
+## 2026-10-08: graph details and complexity score formula
+- Decision: basename resolution uses the target's last path segment; a self-call stays in `edges` and `cycles`. Per-file `metrics`: `loc` (lines with code after stripping), `blocks` (`END` keywords), `branches` (`IF` + `WHEN`), `fan_in`/`fan_out` (distinct other files on graph edges). `score = loc + 2*(branches + blocks) + 5*(fan_in + fan_out)`.
+- Why: every input is countable by hand on the samples, so the golden test can pin it; coupling is weighted more than size because it decides migration risk.
+- Rejected: cyclomatic complexity per unit (needs real parsing); unweighted sum (lets long, flat files dominate).

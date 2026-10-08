@@ -22,3 +22,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 08:47 | claude | /save-progress: step 5 brief + graph design decision (DECISIONS 2026-10-08) committed | next: /work step 5
 2026-10-08 09:20 | claude | /work step 5: graph.build_graph, scan_dir graph, expected.json, SCHEMA, test_graph | 57 passed, CLI == expected.json
 2026-10-08 09:30 | claude | /save-progress after step 5 | 57 passed; next: manager review of step 5, then complexity score brief
+2026-10-08 08:53 | claude (manager) | reviewed brief step 5 graph/cycles/order | accepted: 57 passed rerun, expected graph matches hand computation; test_cli.py edit justified; adj build is O(files*edges) (Later)
+2026-10-08 10:00 | claude | /work step 6: metrics.py, scan_dir fan_in/out + score, expected.json, SCHEMA, test_metrics | 63 passed, CLI == expected.json

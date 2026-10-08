@@ -11,17 +11,19 @@
 - Step 4b: `extract.extract_tables` (read/write, buffers) + 17 tests (2026-10-08)
 - Step 4c: `scanner.scan_dir`, `lumiport scan [--out]` JSON, golden test green (2026-10-08)
 - Step 5: `graph.build_graph` (edges, missing, cycles, order), golden + 6 graph tests (2026-10-08)
+- Step 6: `metrics.file_metrics`, per-file `metrics` + score in scan output, 63 tests pass (2026-10-08)
 
 ## Now
-- Step 5 done, awaiting manager review (`docs/BRIEF.md` Result)
+- Step 6 done, awaiting manager review (`docs/BRIEF.md` Result)
 
 ## Next
-- Complexity score, Markdown report
+- Markdown report (step 7)
 
 ## Later
 - Claude mode: draft Python for one procedure from its inventory facts
 - Decide deadline, public/portfolio repo, license
 - Extractor gaps: `PROCEDURE x PRIVATE:` not matched; `{1}` include args counted as includes; `FUNCTION ... IN handle` counted as unit; table names differing only in case are separate keys
+- graph.py builds adjacency in O(files × edges): fine for samples, slow on large repos
 
 ## Blockers
 - None

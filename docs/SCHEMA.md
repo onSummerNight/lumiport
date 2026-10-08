@@ -11,6 +11,7 @@
 | `runs` | `[string]` | Literal `RUN name.p` targets, as written. |
 | `unresolved_runs` | int | Count of dynamic calls (`RUN VALUE(...)`). Never guessed into `runs`. |
 | `tables` | `{table: "read"\|"write"}` | Keys sorted. |
+| `metrics` | `{loc, blocks, branches, fan_in, fan_out, score}` | See below. |
 
 Rules:
 - Comments (nested `/* */`) and string literals (`"..."`, `'...'`) are stripped first; keywords inside them are ignored.
@@ -18,7 +19,14 @@ Rules:
 - `FOR EACH` and `FIND` mark a table `read`; `CREATE` and `DELETE` mark it `write`. Write wins over read.
 - `DEFINE BUFFER b FOR t` makes `b` an alias: access through `b` counts for table `t`.
 - Table and unit names keep the case used in the source.
-- Not in v1 of the schema: complexity score.
+
+## `metrics`
+
+- `loc`: lines with a non-whitespace character after comments and strings are stripped.
+- `blocks`: `END` keywords (case-insensitive); `END-KEY`, `END-ERROR` and similar are not counted.
+- `branches`: `IF` keywords plus `WHEN` keywords.
+- `fan_in` / `fan_out`: distinct *other* files on incoming / outgoing graph edges (self-edges ignored).
+- `score = loc + 2*(branches + blocks) + 5*(fan_in + fan_out)`.
 
 ## `graph`
 

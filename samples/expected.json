@@ -7,7 +7,8 @@
       "includes": ["common.i"],
       "runs": ["b.p"],
       "unresolved_runs": 0,
-      "tables": {"order": "read"}
+      "tables": {"order": "read"},
+      "metrics": {"loc": 4, "blocks": 0, "branches": 1, "fan_in": 2, "fan_out": 2, "score": 26}
     },
     {
       "path": "b.p",
@@ -16,7 +17,8 @@
       "includes": ["common.i"],
       "runs": ["a.p"],
       "unresolved_runs": 0,
-      "tables": {"order-line": "read"}
+      "tables": {"order-line": "read"},
+      "metrics": {"loc": 6, "blocks": 1, "branches": 1, "fan_in": 1, "fan_out": 2, "score": 25}
     },
     {
       "path": "common.i",
@@ -25,7 +27,8 @@
       "includes": [],
       "runs": [],
       "unresolved_runs": 0,
-      "tables": {}
+      "tables": {},
+      "metrics": {"loc": 2, "blocks": 0, "branches": 0, "fan_in": 5, "fan_out": 0, "score": 27}
     },
     {
       "path": "consts.i",
@@ -34,7 +37,8 @@
       "includes": [],
       "runs": [],
       "unresolved_runs": 0,
-      "tables": {}
+      "tables": {},
+      "metrics": {"loc": 2, "blocks": 0, "branches": 0, "fan_in": 1, "fan_out": 0, "score": 7}
     },
     {
       "path": "main.p",
@@ -43,7 +47,8 @@
       "includes": ["common.i", "consts.i"],
       "runs": ["a.p"],
       "unresolved_runs": 1,
-      "tables": {"customer": "read"}
+      "tables": {"customer": "read"},
+      "metrics": {"loc": 9, "blocks": 1, "branches": 0, "fan_in": 0, "fan_out": 3, "score": 26}
     },
     {
       "path": "order-create.p",
@@ -55,7 +60,8 @@
       "includes": ["common.i", "util.i"],
       "runs": ["price-calc.p"],
       "unresolved_runs": 0,
-      "tables": {"customer": "read", "order": "write", "order-line": "write"}
+      "tables": {"customer": "read", "order": "write", "order-line": "write"},
+      "metrics": {"loc": 16, "blocks": 2, "branches": 1, "fan_in": 0, "fan_out": 3, "score": 37}
     },
     {
       "path": "order-purge.p",
@@ -64,7 +70,8 @@
       "includes": [],
       "runs": [],
       "unresolved_runs": 0,
-      "tables": {"order": "write", "order-line": "read"}
+      "tables": {"order": "write", "order-line": "read"},
+      "metrics": {"loc": 6, "blocks": 1, "branches": 0, "fan_in": 1, "fan_out": 0, "score": 13}
     },
     {
       "path": "ordermgr.cls",
@@ -76,7 +83,8 @@
       "includes": [],
       "runs": ["order-purge.p"],
       "unresolved_runs": 0,
-      "tables": {"order": "read"}
+      "tables": {"order": "read"},
+      "metrics": {"loc": 12, "blocks": 4, "branches": 0, "fan_in": 0, "fan_out": 1, "score": 25}
     },
     {
       "path": "price-calc.p",
@@ -87,7 +95,8 @@
       "includes": [],
       "runs": [],
       "unresolved_runs": 0,
-      "tables": {"item": "read"}
+      "tables": {"item": "read"},
+      "metrics": {"loc": 6, "blocks": 1, "branches": 1, "fan_in": 1, "fan_out": 0, "score": 15}
     },
     {
       "path": "report.p",
@@ -98,7 +107,8 @@
       "includes": ["common.i"],
       "runs": [],
       "unresolved_runs": 0,
-      "tables": {"customer": "read", "order": "read"}
+      "tables": {"customer": "read", "order": "read"},
+      "metrics": {"loc": 11, "blocks": 2, "branches": 0, "fan_in": 0, "fan_out": 1, "score": 20}
     },
     {
       "path": "util.i",
@@ -109,7 +119,8 @@
       "includes": [],
       "runs": [],
       "unresolved_runs": 0,
-      "tables": {}
+      "tables": {},
+      "metrics": {"loc": 3, "blocks": 1, "branches": 0, "fan_in": 1, "fan_out": 0, "score": 10}
     }
   ],
   "graph": {

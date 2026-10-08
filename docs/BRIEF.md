@@ -1,34 +1,34 @@
-# Brief: step 5, dependency graph, cycles, migration order
+# Brief: step 6, complexity score per file
 
-**Goal:** `scan_dir` output gains a top-level `graph` with `edges`, `missing`, `cycles` and `order`, following the 2026-10-08 entry in `docs/DECISIONS.md`. The golden test covers it.
+**Goal:** each file entry in the scan output gains `metrics: {loc, blocks, branches, fan_in, fan_out, score}`, using the formula in `docs/DECISIONS.md` (2026-10-08, "graph details and complexity score formula"). The golden test pins it.
 
-**Why now:** the inventory is done. Graph and order are the next v1 scope item, and the complexity score and report build on them.
+**Why now:** it's the last inventory number v1 needs. The Markdown report (step 7) only formats data that already exists.
 
 ## Steps
-1. `docs/SCHEMA.md`: add `graph` with these fields:
-   - `edges`: `[[from, to, "run"|"include"]]`, sorted.
-   - `missing`: sorted `[[from, target]]` for targets that don't resolve.
-   - `cycles`: each cycle's files sorted, cycles themselves sorted. Only components with more than one file, or a file that calls itself.
-   - `order`: `[[paths...], ...]` steps.
-2. `src/lumiport/graph.py`: `build_graph(files: list) -> dict`. Resolve each target by exact relative path (case-insensitive), else by unique basename, else put it in `missing`. Find strongly connected components iteratively (no recursion limit issues). Each step contains every component whose dependencies all sit in earlier steps.
-3. `scanner.scan_dir` returns `{"files": [...], "graph": build_graph(files)}`.
-4. Update `samples/expected.json` by hand. My hand computation, for you to confirm or contradict:
-   - Steps: 1 = common.i, consts.i, order-purge.p, price-calc.p, util.i; 2 = a.p, b.p, order-create.p, ordermgr.cls, report.p; 3 = main.p.
-   - One cycle: [a.p, b.p]. No missing targets.
-5. `tests/test_graph.py`: inline tests for a self-call, a missing target, a diamond, basename resolution, an ambiguous basename (goes to `missing`), and a 3-file cycle.
+1. `docs/SCHEMA.md`: add `metrics` (after `tables`) with the rules below and the score formula.
+2. `src/lumiport/metrics.py`: `file_metrics(code: str) -> dict` works on stripped code.
+   - `loc`: lines that contain any non-whitespace character.
+   - `blocks`: `END` keywords, case-insensitive, not part of `END-KEY`, `END-ERROR` and similar.
+   - `branches`: `IF` keywords plus `WHEN` keywords.
+3. In `scan_dir`, after `build_graph`, add `fan_in`/`fan_out`: the number of distinct *other* files on incoming/outgoing edges, so self-edges don't count. Then compute `score = loc + 2*(branches + blocks) + 5*(fan_in + fan_out)`.
+4. Update `samples/expected.json` by hand for all 11 files. In Result, show your working for `order-create.p` and `report.p`.
+5. `tests/test_metrics.py`: inline tests for blank lines only, `END-ERROR` not counted, lower-case `if`, `CASE ... WHEN ... WHEN`, a comment-only line (loc 0 after stripping), and a self-call that doesn't add to fan_in/fan_out.
 
 ## Acceptance check
-`.venv/bin/pytest -q`: all pass, 0 xfailed. The CLI-vs-`expected.json` check from step 4c still exits 0.
+`.venv/bin/pytest -q`: all pass. The CLI-vs-`expected.json` check still exits 0.
 
 ## Constraints
-- Standard library only. Don't change `tokenizer.py` or `extract.py`. Edit `expected.json` only to add `graph`.
+- Standard library only. Don't change `tokenizer.py`, `extract.py` or `graph.py`, except to expose edges if needed. Edit `expected.json` only to add `metrics`.
 
 ## Out of scope
-- Complexity score, Markdown report, any graph drawing (dot/mermaid).
+- Markdown report, sorting the order by score, per-unit metrics, the O(files × edges) graph fix.
 
 ## Result
-Done. Hand computation confirmed (3 steps, one cycle [a.p, b.p], no missing).
-- `.venv/bin/pytest -q`: 57 passed, 0 xfailed
-- CLI `scan samples/app --out` vs `expected.json`: exit 0, identical
-- Also edited `tests/test_cli.py` (empty-dir expectation now includes `graph`), not listed in the brief.
-Decide: a basename match uses the target's last path segment; a self-edge is kept in `edges` and `cycles`.
+
+Done. `.venv/bin/pytest -q`: 63 passed; CLI output == `samples/expected.json` (exit 0).
+
+Working (hand-counted from the sample source, then matched by the code):
+- `order-create.p`: loc 16 (lines 2,3,5,7,8,10,11,13,14,16-19,21-23); blocks 2 (END PROCEDURE, END FUNCTION); branches 1 (IF); fan_out 3 (common.i, util.i, price-calc.p); fan_in 0 -> 16 + 2*3 + 5*3 = **37**
+- `report.p`: loc 11 (comment lines 1-4 blank after stripping); blocks 2 (END., END PROCEDURE); branches 0; fan_out 1 (common.i); fan_in 0 -> 11 + 4 + 5 = **20**
+
+Decide: `IF` is counted for inline `IF ... THEN ... ELSE` expressions too (price-calc.p), per "IF keywords". Also `END` is counted in `END CLASS`/`END METHOD`.
