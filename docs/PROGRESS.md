@@ -3,7 +3,7 @@
 ## Done
 - Scaffold created
 - Context agreed and LOCKED 2026-10-08
-- Repo on GitHub (private): onSummerNight/lumiport
+- Repo on GitHub: onSummerNight/lumiport (public since 2026-10-08)
 - Step 1: project skeleton, `lumiport scan` stub, 2 smoke tests pass (2026-10-08)
 - Step 2: 11-file sample app, `samples/expected.json`, `docs/SCHEMA.md`, xfail golden test (2026-10-08)
 - Step 3: `tokenizer.strip_code` + 13 tests (2026-10-08)
@@ -21,7 +21,7 @@
 - **v1 done:** `lumiport scan <dir> [--out] [--report]` gives inventory, graph, cycles, migration order, complexity score and Markdown report; 77 tests on Python 3.10 and 3.14
 
 ## Now
-- Awaiting user: push, tag push, make public
+- v0.1.0 pushed and tagged; repo public at github.com/onSummerNight/lumiport (2026-10-08). No in-scope work left; v2 (Claude mode) needs `/decide`
 
 ## Next
 - Nothing queued
