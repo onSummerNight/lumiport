@@ -1,0 +1,115 @@
+{
+  "files": [
+    {
+      "path": "a.p",
+      "kind": "p",
+      "units": [],
+      "includes": ["common.i"],
+      "runs": ["b.p"],
+      "unresolved_runs": 0,
+      "tables": {"order": "read"}
+    },
+    {
+      "path": "b.p",
+      "kind": "p",
+      "units": [],
+      "includes": ["common.i"],
+      "runs": ["a.p"],
+      "unresolved_runs": 0,
+      "tables": {"order-line": "read"}
+    },
+    {
+      "path": "common.i",
+      "kind": "i",
+      "units": [],
+      "includes": [],
+      "runs": [],
+      "unresolved_runs": 0,
+      "tables": {}
+    },
+    {
+      "path": "consts.i",
+      "kind": "i",
+      "units": [],
+      "includes": [],
+      "runs": [],
+      "unresolved_runs": 0,
+      "tables": {}
+    },
+    {
+      "path": "main.p",
+      "kind": "p",
+      "units": [],
+      "includes": ["common.i", "consts.i"],
+      "runs": ["a.p"],
+      "unresolved_runs": 1,
+      "tables": {"customer": "read"}
+    },
+    {
+      "path": "order-create.p",
+      "kind": "p",
+      "units": [
+        {"name": "addLine", "type": "procedure"},
+        {"name": "fmtMoney", "type": "function"}
+      ],
+      "includes": ["common.i", "util.i"],
+      "runs": ["price-calc.p"],
+      "unresolved_runs": 0,
+      "tables": {"customer": "read", "order": "write", "order-line": "write"}
+    },
+    {
+      "path": "order-purge.p",
+      "kind": "p",
+      "units": [],
+      "includes": [],
+      "runs": [],
+      "unresolved_runs": 0,
+      "tables": {"order": "write", "order-line": "read"}
+    },
+    {
+      "path": "ordermgr.cls",
+      "kind": "cls",
+      "units": [
+        {"name": "countOpen", "type": "method"},
+        {"name": "purge", "type": "method"}
+      ],
+      "includes": [],
+      "runs": ["order-purge.p"],
+      "unresolved_runs": 0,
+      "tables": {"order": "read"}
+    },
+    {
+      "path": "price-calc.p",
+      "kind": "p",
+      "units": [
+        {"name": "discount", "type": "function"}
+      ],
+      "includes": [],
+      "runs": [],
+      "unresolved_runs": 0,
+      "tables": {"item": "read"}
+    },
+    {
+      "path": "report.p",
+      "kind": "p",
+      "units": [
+        {"name": "printLine", "type": "procedure"}
+      ],
+      "includes": ["common.i"],
+      "runs": [],
+      "unresolved_runs": 0,
+      "tables": {"customer": "read", "order": "read"}
+    },
+    {
+      "path": "util.i",
+      "kind": "i",
+      "units": [
+        {"name": "trimAll", "type": "function"}
+      ],
+      "includes": [],
+      "runs": [],
+      "unresolved_runs": 0,
+      "tables": {}
+    }
+  ]
+}

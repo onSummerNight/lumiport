@@ -7,3 +7,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 08:14 | claude | /save-progress: initial commit of scaffold + locked context | next: step 1 project skeleton
 2026-10-08 08:17 | claude | /connect-github: created private repo onSummerNight/lumiport, pushed main | in sync; next: step 1 project skeleton
 2026-10-08 08:19 | claude | /work step 1 skeleton: pyproject, src/lumiport, cli scan stub, tests/test_cli.py | 2 passed, scan docs exit 0
+2026-10-08 08:19 | claude (manager) | reviewed brief step 1 skeleton | accepted: 2 passed rerun, scope clean; Python 3.10 untested
+2026-10-08 08:27 | claude | /work step 2: samples/app (11 files), expected.json, docs/SCHEMA.md, xfail golden test | 2 passed, 1 xfailed

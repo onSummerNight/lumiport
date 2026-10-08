@@ -1,0 +1,3 @@
+/* consts.i - limits */
+&SCOPED-DEFINE MAX-LINES 99
+&SCOPED-DEFINE TAX-RATE 0.2
