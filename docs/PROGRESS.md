@@ -12,12 +12,13 @@
 - Step 4c: `scanner.scan_dir`, `lumiport scan [--out]` JSON, golden test green (2026-10-08)
 - Step 5: `graph.build_graph` (edges, missing, cycles, order), golden + 6 graph tests (2026-10-08)
 - Step 6: `metrics.file_metrics`, per-file `metrics` + score in scan output, 63 tests pass (2026-10-08)
+- Step 7: `report.render_report`, `scan --report FILE`, `samples/expected-report.md`, 66 tests pass (2026-10-08)
 
 ## Now
-- Step 6 done, awaiting manager review (`docs/BRIEF.md` Result)
+- Step 7 done, awaiting manager review (`docs/BRIEF.md` Result)
 
 ## Next
-- Markdown report (step 7)
+- README/usage docs
 
 ## Later
 - Claude mode: draft Python for one procedure from its inventory facts

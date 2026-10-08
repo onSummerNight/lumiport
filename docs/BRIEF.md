@@ -1,34 +1,34 @@
-# Brief: step 6, complexity score per file
+# Brief: step 7, Markdown report
 
-**Goal:** each file entry in the scan output gains `metrics: {loc, blocks, branches, fan_in, fan_out, score}`, using the formula in `docs/DECISIONS.md` (2026-10-08, "graph details and complexity score formula"). The golden test pins it.
+**Goal:** `lumiport.report.render_report(inventory: dict) -> str` turns the scan JSON into a Markdown report, and `lumiport scan <dir> --report FILE.md` writes it. This finishes the last v1 scope item.
 
-**Why now:** it's the last inventory number v1 needs. The Markdown report (step 7) only formats data that already exists.
+**Why now:** the inventory, graph and metrics are complete and pinned. The report only formats data that already exists.
 
 ## Steps
-1. `docs/SCHEMA.md`: add `metrics` (after `tables`) with the rules below and the score formula.
-2. `src/lumiport/metrics.py`: `file_metrics(code: str) -> dict` works on stripped code.
-   - `loc`: lines that contain any non-whitespace character.
-   - `blocks`: `END` keywords, case-insensitive, not part of `END-KEY`, `END-ERROR` and similar.
-   - `branches`: `IF` keywords plus `WHEN` keywords.
-3. In `scan_dir`, after `build_graph`, add `fan_in`/`fan_out`: the number of distinct *other* files on incoming/outgoing edges, so self-edges don't count. Then compute `score = loc + 2*(branches + blocks) + 5*(fan_in + fan_out)`.
-4. Update `samples/expected.json` by hand for all 11 files. In Result, show your working for `order-create.p` and `report.p`.
-5. `tests/test_metrics.py`: inline tests for blank lines only, `END-ERROR` not counted, lower-case `if`, `CASE ... WHEN ... WHEN`, a comment-only line (loc 0 after stripping), and a self-call that doesn't add to fan_in/fan_out.
+1. `src/lumiport/report.py`, a pure function of the inventory dict. Sections, in this order:
+   - **Summary:** files per kind, total loc, units, tables, cycles, missing targets, total unresolved RUNs.
+   - **Migration order:** one table per step with path, kind and score, sorted by score (highest first) then path. Mark files that are in a cycle.
+   - **Cycles**, **Missing targets** and **Unresolved dynamic calls**: one line each per file, or "None".
+   - **Tables:** one row per table with its readers and its writers.
+   - **Files:** one row per file with loc, blocks, branches, fan_in, fan_out and score.
+   - **How the score is computed:** the formula and what each input counts, taken from SCHEMA.md.
+2. `cli.py`: add `--report FILE`. It works alongside `--out`, and stdout JSON stays the same when neither option is given.
+3. `samples/expected-report.md`: generate it from `samples/expected.json`, then check every number in it against `expected.json` by hand. In Result, list the summary numbers and how you checked them.
+4. `tests/test_report.py`: `render_report(expected.json) == expected-report.md`. Add an inline test that an empty inventory renders "None" sections without crashing. Add a CLI test that `--report` writes the file.
 
 ## Acceptance check
-`.venv/bin/pytest -q`: all pass. The CLI-vs-`expected.json` check still exits 0.
+`.venv/bin/pytest -q`: all pass. `.venv/bin/lumiport scan samples/app --report /tmp/r.md && diff /tmp/r.md samples/expected-report.md` exits 0.
 
 ## Constraints
-- Standard library only. Don't change `tokenizer.py`, `extract.py` or `graph.py`, except to expose edges if needed. Edit `expected.json` only to add `metrics`.
+- Standard library only. Plain GitHub Markdown, no HTML. Change no other modules, `expected.json` or `SCHEMA.md`.
 
 ## Out of scope
-- Markdown report, sorting the order by score, per-unit metrics, the O(files × edges) graph fix.
+- Graph diagrams (mermaid/dot), HTML output, README/usage docs (the next brief).
 
 ## Result
 
-Done. `.venv/bin/pytest -q`: 63 passed; CLI output == `samples/expected.json` (exit 0).
+Done. `.venv/bin/pytest -q`: 66 passed. `lumiport scan samples/app --report r.md && diff r.md samples/expected-report.md`: exit 0.
 
-Working (hand-counted from the sample source, then matched by the code):
-- `order-create.p`: loc 16 (lines 2,3,5,7,8,10,11,13,14,16-19,21-23); blocks 2 (END PROCEDURE, END FUNCTION); branches 1 (IF); fan_out 3 (common.i, util.i, price-calc.p); fan_in 0 -> 16 + 2*3 + 5*3 = **37**
-- `report.p`: loc 11 (comment lines 1-4 blank after stripping); blocks 2 (END., END PROCEDURE); branches 0; fan_out 1 (common.i); fan_in 0 -> 11 + 4 + 5 = **20**
+Summary numbers: 11 files (7 .p, 3 .i, 1 .cls), loc 77, units 7, tables 4, cycles 1, missing 0, unresolved 1. Checked by recomputing from `expected.json` with a separate script (loc sum, units, distinct tables, readers/writers per table, unresolved) and units against the sample source by eye.
 
-Decide: `IF` is counted for inline `IF ... THEN ... ELSE` expressions too (price-calc.p), per "IF keywords". Also `END` is counted in `END CLASS`/`END METHOD`.
+Decide: with `--report` alone, JSON still prints to stdout (only `--out` redirects it). A table both read and written by one file shows that file under Writers only (write wins, per SCHEMA).

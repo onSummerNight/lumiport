@@ -25,3 +25,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 08:53 | claude (manager) | reviewed brief step 5 graph/cycles/order | accepted: 57 passed rerun, expected graph matches hand computation; test_cli.py edit justified; adj build is O(files*edges) (Later)
 2026-10-08 10:00 | claude | /work step 6: metrics.py, scan_dir fan_in/out + score, expected.json, SCHEMA, test_metrics | 63 passed, CLI == expected.json
 2026-10-08 10:10 | claude | /save-progress after step 6 | 63 passed; tree clean, pushed; next: manager review, then step 7 Markdown report
+2026-10-08 18:45 | claude (manager) | reviewed brief step 6 metrics + score | accepted: 63 passed rerun, CLI == expected.json, loc for order-create.p (16) and report.p (11) re-counted by hand and match; IF in inline expressions and END CLASS/METHOD count, as SCHEMA says
+2026-10-08 19:10 | claude | /work step 7: report.py, cli --report, expected-report.md, test_report | 66 passed, CLI report == expected-report.md
