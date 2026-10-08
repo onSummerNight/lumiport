@@ -27,3 +27,5 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 10:10 | claude | /save-progress after step 6 | 63 passed; tree clean, pushed; next: manager review, then step 7 Markdown report
 2026-10-08 18:45 | claude (manager) | reviewed brief step 6 metrics + score | accepted: 63 passed rerun, CLI == expected.json, loc for order-create.p (16) and report.p (11) re-counted by hand and match; IF in inline expressions and END CLASS/METHOD count, as SCHEMA says
 2026-10-08 19:10 | claude | /work step 7: report.py, cli --report, expected-report.md, test_report | 66 passed, CLI report == expected-report.md
+2026-10-08 18:49 | claude (manager) | reviewed brief step 7 Markdown report | accepted: 66 passed rerun, --report diff clean, summary loc/units/tables recomputed (77/7/4), a.p and common.i scores re-checked by hand; commit 182df8d not pushed
+2026-10-08 19:40 | claude | /work step 8: README.md, fresh-clone run of every command | all commands exit 0, 66 passed
