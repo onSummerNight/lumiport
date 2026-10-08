@@ -17,3 +17,4 @@ Append-only. `YYYY-MM-DD HH:MM | who | what | result` (local time).
 2026-10-08 08:40 | claude | /work step 4b: extract.extract_tables + tests | 49 passed, 1 xfailed
 2026-10-08 08:34 | claude (manager) | reviewed brief step 4b extract_tables | accepted: 49 passed 1 xfailed rerun, code read; gap: table-name case variants become separate keys (Later)
 2026-10-08 08:50 | claude | /work step 4c: scanner.scan_dir + CLI JSON, golden un-xfailed | 51 passed, 0 xfailed
+2026-10-08 09:00 | claude | /save-progress after step 4c | 51 passed; next: step 5 graph/cycles/migration order (no brief yet)
